@@ -6,6 +6,7 @@
 import signal
 import sys
 import ssl
+import time
 import logging
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
 from optparse import OptionParser
@@ -18,12 +19,21 @@ class SimpleEcho(WebSocket):
     def handleMessage(self):
         if self.data is None:
             self.data = ''
-
+            #Aqui es donde procesamos los mensajes que mandamos cada vez que nos hace un submit el cliente,(Con self.data vemos el mensaje que nos han mandado)       
         try:
-            self.sendMessage(str(self.data))
+            if(self.data == "getTime"):
+                self.sendMessage(str("Hora: " + (str(time.localtime().tm_hour) + ":" + str(time.localtime().tm_min) + ":" + str(time.localtime().tm_sec))))       
+            else:
+                self.sendMessage(str("Mensaje: " + str(self.data)))
         except Exception as n:
             print n
 
+    def handleTime(self):
+        #Aqui donde manejamos el envio de la hora en punto, que la llamamos desde la funcion de SimpleWebSocketServer.py(522)
+        try:
+            self.sendMessage(str("Hora: " + (str(time.localtime().tm_hour) + ":" + str(time.localtime().tm_min) + ":" + str(time.localtime().tm_sec) + str(time.localtime().tm_sec))))
+        except Exception as n:
+            print n
     def handleConnected(self):
         print self.address, 'connected'
 
